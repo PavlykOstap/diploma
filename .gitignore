@@ -1,0 +1,21 @@
+.venv/
+.codex_run_deps/
+.git-work/
+__pycache__/
+*.py[cod]
+*.log
+
+# Local MongoDB data and runtime files
+mongo-data-27018/
+mongo-27018.log
+data/user_profiles.json
+
+# Large raw datasets. Keep the compact catalog used by the app.
+data/TMDB_movie_dataset_v11.csv
+data/IMDB Dataset.csv
+
+# Local/editor noise
+.streamlit/secrets.toml
+.env
+.DS_Store
+Thumbs.db

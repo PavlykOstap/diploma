@@ -2093,7 +2093,7 @@ div[data-testid="stVerticalBlock"]:has(.ms-auth-form-marker) div[data-testid="st
 .ms-stat-row {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
   margin-top: 24px;
 }
@@ -3187,7 +3187,6 @@ def render_profile_page(movies: pd.DataFrame, lang: str) -> None:
         <div class="ms-stat-row">
           <div class="ms-stat"><strong>0</strong><span>{html.escape(t(lang, "Переглянуто", "Watched"))}</span></div>
           <div class="ms-stat"><strong>{len(watch_later)}</strong><span>{html.escape(t(lang, "У списку", "In list"))}</span></div>
-          <div class="ms-stat"><strong>0</strong><span>{html.escape(t(lang, "Оцінок", "Ratings"))}</span></div>
         </div>
         <div class="ms-profile-note">
           <div class="ms-profile-note-title">{html.escape(t(lang, "Профіль", "Profile"))}</div>

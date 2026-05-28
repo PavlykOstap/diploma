@@ -397,6 +397,38 @@ def query_href_with_updates(**updates: object) -> str:
     return f"?{query}" if query else "?"
 
 
+def panel_switch_href(panel: str) -> str:
+    resets = {
+        "title": {
+            "hero_panel": "title",
+            "movie": None,
+            "genre": None,
+            "year_min": None,
+            "year_max": None,
+            "sort_by": None,
+            "ai_message": None,
+            "chat_memory": None,
+        },
+        "filters": {
+            "hero_panel": "filters",
+            "movie": None,
+            "title_search": None,
+            "ai_message": None,
+            "chat_memory": None,
+        },
+        "ai": {
+            "hero_panel": "ai",
+            "movie": None,
+            "title_search": None,
+            "genre": None,
+            "year_min": None,
+            "year_max": None,
+            "sort_by": None,
+        },
+    }
+    return query_href_with_updates(**resets.get(panel, {"hero_panel": panel, "movie": None}))
+
+
 def register_user(username: str, email: str, password: str, confirm_password: str) -> tuple[bool, str]:
     normalized = normalize_username(username)
     email = email.strip().lower()
@@ -563,6 +595,7 @@ footer {
 
 .ms-hero {
   position: relative;
+  isolation: isolate;
   overflow: visible;
   width: calc(100% + 326px);
   max-width: none;
@@ -617,8 +650,12 @@ footer {
 }
 
 .ms-account-actions {
+  position: relative;
+  z-index: 6;
   margin-top: 54px;
+  transform: none !important;
   display: flex;
+  align-self: start;
   align-items: stretch;
   justify-content: flex-end;
   gap: 10px;
@@ -676,18 +713,21 @@ footer {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 0;
   border-radius: inherit;
   background:
     radial-gradient(circle 680px at 10% 0%, rgba(124, 58, 237, 0.24), transparent 38%),
     radial-gradient(circle 420px at 92% 10%, rgba(56, 189, 248, 0.18), transparent 35%),
     radial-gradient(circle at 35% 90%, rgba(255,255,255,0.08), transparent 24%);
   opacity: 0.95;
+  pointer-events: none;
 }
 
 .ms-hero::after {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 0;
   border-radius: inherit;
   background: linear-gradient(180deg, rgba(255,255,255,0.08), transparent 18%, transparent 82%, rgba(0,0,0,0.16));
   pointer-events: none;
@@ -696,7 +736,7 @@ footer {
 
 .ms-hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 270px;
   gap: 24px;
@@ -788,7 +828,8 @@ div[data-testid="stHorizontalBlock"]:has(.ms-hero) > div[data-testid="stColumn"]
 
 .ms-hero-panel {
   position: relative;
-  z-index: 30;
+  z-index: 70;
+  pointer-events: auto;
   margin-top: 68px;
   margin-left: auto;
   margin-right: auto;
@@ -801,6 +842,8 @@ div[data-testid="stHorizontalBlock"]:has(.ms-hero) > div[data-testid="stColumn"]
 }
 
 .ms-hero-form {
+  position: relative;
+  z-index: 75;
   display: grid;
   grid-template-columns: minmax(180px, 1fr) auto;
   gap: 12px;
@@ -808,6 +851,7 @@ div[data-testid="stHorizontalBlock"]:has(.ms-hero) > div[data-testid="stColumn"]
 }
 
 .ms-hero-filter-form {
+  overflow: visible;
   grid-template-columns: minmax(150px, 1.2fr) minmax(110px, 0.8fr) minmax(110px, 0.8fr) minmax(150px, 1fr) auto;
 }
 
@@ -828,6 +872,10 @@ div[data-testid="stHorizontalBlock"]:has(.ms-hero) > div[data-testid="stColumn"]
 
 .ms-hero-input,
 .ms-hero-select {
+  position: relative;
+  z-index: 80;
+  pointer-events: auto !important;
+  user-select: text;
   width: 100%;
   min-height: 44px;
   border-radius: 12px;
@@ -840,11 +888,11 @@ div[data-testid="stHorizontalBlock"]:has(.ms-hero) > div[data-testid="stColumn"]
 
 .ms-genre-dropdown {
   position: relative;
-  z-index: 40;
+  z-index: 120;
 }
 
 .ms-genre-dropdown[open] {
-  z-index: 120;
+  z-index: 300;
 }
 
 .ms-genre-dropdown summary {
@@ -869,7 +917,8 @@ div[data-testid="stHorizontalBlock"]:has(.ms-hero) > div[data-testid="stColumn"]
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  z-index: 80;
+  z-index: 320;
+  pointer-events: auto;
   max-height: 196px;
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -882,6 +931,9 @@ div[data-testid="stHorizontalBlock"]:has(.ms-hero) > div[data-testid="stColumn"]
 }
 
 .ms-genre-option {
+  position: relative;
+  z-index: 330;
+  pointer-events: auto;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -909,6 +961,9 @@ div[data-testid="stHorizontalBlock"]:has(.ms-hero) > div[data-testid="stColumn"]
 }
 
 .ms-hero-submit {
+  position: relative;
+  z-index: 80;
+  pointer-events: auto;
   min-height: 44px;
   border-radius: 999px;
   border: 1px solid var(--ms-border-strong);
@@ -921,6 +976,15 @@ div[data-testid="stHorizontalBlock"]:has(.ms-hero) > div[data-testid="stColumn"]
 }
 
 .ms-hero-textarea {
+  min-height: 44px;
+  height: 44px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  resize: none;
+  overflow-y: hidden;
+}
+
+.ms-hero-title-textarea {
   min-height: 44px;
   height: 44px;
   padding-top: 10px;
@@ -2561,14 +2625,40 @@ def get_title_display(row: pd.Series, lang: str) -> str:
 
 
 def filter_by_title_query(movies: pd.DataFrame, query: str) -> pd.DataFrame:
-    query = str(query or "").strip()
+    query = clean_display_text(str(query or "").replace("\r", " ").replace("\n", " "))
     if not query:
         return movies
+    search_terms = {query}
+    alias = resolve_known_title_alias(query)
+    if alias:
+        search_terms.add(alias)
+    query_norm = normalize_title_match_text(query)
+    if query_norm:
+        for alias_key, alias_title in MOVIE_TITLE_ALIASES.items():
+            alias_key_norm = normalize_title_match_text(alias_key)
+            if not alias_key_norm:
+                continue
+            if query_norm == alias_key_norm or query_norm in alias_key_norm or alias_key_norm in query_norm:
+                search_terms.add(alias_title)
     mask = pd.Series(False, index=movies.index)
     for column in ["title", "title_ua", "tmdb_title", "tmdb_title_ua"]:
         if column not in movies.columns:
             continue
-        mask = mask | movies[column].fillna("").astype(str).str.contains(query, case=False, na=False)
+        column_values = movies[column].fillna("").astype(str)
+        for term in search_terms:
+            term = clean_display_text(term)
+            if term:
+                mask = mask | column_values.str.contains(term, case=False, na=False, regex=False)
+    for title_en, title_ua in TITLE_UA_MAP.items():
+        title_ua_norm = normalize_title_match_text(title_ua)
+        title_en_norm = normalize_title_match_text(title_en)
+        if query_norm and (
+            query_norm == title_ua_norm
+            or query_norm == title_en_norm
+            or query_norm in title_ua_norm
+            or query_norm in title_en_norm
+        ):
+            mask = mask | movies["title"].fillna("").astype(str).str.contains(title_en, case=False, na=False, regex=False)
     return movies.loc[mask].copy()
 
 
@@ -3133,6 +3223,14 @@ CHAT_GREETING_TERMS = {"привіт", "привет", "ку", "хай", "hello"
 CHAT_THANKS_TERMS = {"дякую", "спасибі", "спасибо", "thanks", "thank you", "ок", "окей", "добре", "супер"}
 CHAT_HELP_TERMS = {"що ти вмієш", "що можеш", "допоможи", "help", "як працює", "як шукати"}
 CHAT_LATEST_TERMS = {"новин", "новину", "новинк", "новинка", "новинку", "новинки", "нове", "нові", "новий", "новеньк", "свіж", "свіже", "свіжі", "свіжак", "найновіше", "latest", "new", "new release", "new movie"}
+CHAT_LATEST_TERMS.update({
+    "\u043d\u043e\u0432\u0438\u0445",
+    "\u043d\u043e\u0432\u043e\u0433\u043e",
+    "\u043d\u043e\u0432\u0438\u043c",
+    "\u043d\u043e\u0432\u0438\u043c\u0438",
+    "\u043d\u0430\u0439\u043d\u043e\u0432\u0456\u0448\u0456",
+    "\u043d\u0430\u0439\u043d\u043e\u0432\u0456\u0448\u0438\u0445",
+})
 CHAT_POPULAR_TERMS = {"популярне", "популярні", "популярний", "тренд", "трендов", "popular", "trending"}
 CHAT_TOP_TERMS = {"топ", "найкраще", "найкращі", "високий рейтинг", "рейтинг", "рейтингом", "оцінка", "оцінки", "best", "top rated", "high rated"}
 CHAT_QUALITY_TERMS = {"норм", "нормальн", "хорош", "гарн", "сильн", "висок", "якісн", "крут", "не поган", "непоган", "рейтинг", "рейтингом", "оцінк", "good", "decent", "quality"}
@@ -3178,6 +3276,28 @@ MOVIE_TITLE_ALIASES = {
 }
 
 MOVIE_TITLE_ALIASES.update({
+    "барбі": "Barbie",
+    "барби": "Barbie",
+    "форсаж": "Fast X",
+    "форсажа": "Fast X",
+    "форсажем": "Fast X",
+    "форсажі": "Fast X",
+    "форсажу": "Fast X",
+    "гран турізмо": "Gran Turismo",
+    "гран турисмо": "Gran Turismo",
+    "трансформери": "Transformers: Rise of the Beasts",
+    "трансформер": "Transformers",
+    "бамблбі": "Bumblebee",
+    "джон вік": "John Wick: Chapter 4",
+    "гаррі поттер": "Harry Potter and the Philosopher's Stone",
+    "гаррі потера": "Harry Potter and the Philosopher's Stone",
+    "гарі потера": "Harry Potter and the Philosopher's Stone",
+    "людина павук": "Spider-Man: No Way Home",
+    "людина-павук": "Spider-Man: No Way Home",
+    "месники": "Avengers: Infinity War",
+    "аватар": "Avatar: The Way of Water",
+    "зоряні війни": "Star Wars",
+    "володар перснів": "The Lord of the Rings: The Fellowship of the Ring",
     "трансформери": "Transformers: Rise of the Beasts",
     "трансформер": "Transformers",
     "transformers": "Transformers: Rise of the Beasts",
@@ -3186,6 +3306,8 @@ MOVIE_TITLE_ALIASES.update({
     "джон вік": "John Wick: Chapter 4",
     "john wick": "John Wick: Chapter 4",
     "гаррі поттер": "Harry Potter and the Philosopher's Stone",
+    "гаррі потера": "Harry Potter and the Philosopher's Stone",
+    "гарі потера": "Harry Potter and the Philosopher's Stone",
     "harry potter": "Harry Potter and the Philosopher's Stone",
     "людина павук": "Spider-Man: No Way Home",
     "людина-павук": "Spider-Man: No Way Home",
@@ -3220,6 +3342,21 @@ SIMILARITY_PROFILE_QUERIES = {
         "transformers robots alien machines giant robots action science fiction adventure battle invasion "
         "bumblebee autobots decepticons mech technology world saving spectacle"
     ),
+    "Harry Potter and the Philosopher's Stone": (
+        "wizard magic school witchcraft fantasy adventure friendship young hero prophecy dark lord "
+        "hogwarts spells magical creatures family mystery hobbit lord of the rings narnia fantastic beasts"
+    ),
+}
+
+SIMILARITY_RELATED_TITLE_BOOSTS = {
+    "Harry Potter and the Philosopher's Stone": {
+        "harry potter": 4.0,
+        "fantastic beasts": 3.8,
+        "hobbit": 3.6,
+        "lord of the rings": 3.6,
+        "narnia": 3.2,
+        "percy jackson": 2.9,
+    },
 }
 
 SIMILARITY_PROFILE_BOOST_TERMS = {
@@ -3242,6 +3379,22 @@ SIMILARITY_PROFILE_BOOST_TERMS = {
         "transformers", "robot", "robots", "alien", "machine", "machines", "autobot", "autobots",
         "decepticon", "decepticons", "bumblebee", "mech", "action", "adventure", "science", "fiction",
         "godzilla", "kong", "pacific", "rim", "steel",
+    ],
+    "Harry Potter and the Philosopher's Stone": [
+        "wizard", "magic", "magical", "spell", "spells", "witch", "witchcraft", "school", "hogwarts",
+        "fantasy", "adventure", "young", "hero", "prophecy", "creatures", "mystery", "hobbit",
+        "rings", "narnia", "beasts",
+    ],
+}
+
+SIMILARITY_REQUIRED_TERMS = {
+    "Fast X": [
+        "fast", "furious", "race", "racing", "driver", "drive", "cars", "car", "chase",
+        "drift", "speed", "heist", "transport", "transporter", "taxi", "turbo",
+    ],
+    "The Fast and the Furious": [
+        "fast", "furious", "race", "racing", "driver", "drive", "cars", "car", "chase",
+        "drift", "speed", "heist",
     ],
 }
 
@@ -3458,6 +3611,31 @@ def build_seed_similarity_profile(movies: Optional[pd.DataFrame], seed_title: st
     return {"terms": terms, "title_terms": title_terms, "genres": genres}
 
 
+def add_related_title_candidates(results: pd.DataFrame, seed_title: str, movies: pd.DataFrame) -> pd.DataFrame:
+    related_titles = SIMILARITY_RELATED_TITLE_BOOSTS.get(seed_title, {})
+    if movies is None or movies.empty or not related_titles:
+        return results
+    title_text = movies["title"].fillna("").astype(str).str.lower()
+    related_score = pd.Series(0.0, index=movies.index)
+    for term, score in related_titles.items():
+        related_score = related_score.where(
+            ~title_text.str.contains(re.escape(term), regex=True, na=False),
+            related_score.combine(pd.Series(score, index=movies.index), max),
+        )
+    related = movies.loc[related_score.gt(0)].copy()
+    if related.empty:
+        return results
+    related["semantic_similarity"] = related_score.loc[related.index].astype(float)
+    combined = pd.concat([results, related], ignore_index=True)
+    combined["_similar_key"] = (
+        combined["title"].fillna("").astype(str).str.lower()
+        + "|"
+        + combined["year"].fillna("").astype(str)
+    )
+    combined = combined.sort_values("semantic_similarity", ascending=False, na_position="last")
+    return combined.drop_duplicates("_similar_key", keep="first").drop(columns=["_similar_key"])
+
+
 def apply_similar_profile_boost(results: pd.DataFrame, seed_title: str, movies: Optional[pd.DataFrame] = None) -> pd.DataFrame:
     if results.empty:
         return results
@@ -3516,6 +3694,50 @@ def apply_similar_profile_boost(results: pd.DataFrame, seed_title: str, movies: 
     return boosted
 
 
+def apply_required_similarity_terms(results: pd.DataFrame, seed_title: str) -> pd.DataFrame:
+    terms = SIMILARITY_REQUIRED_TERMS.get(seed_title, [])
+    if results.empty or not terms:
+        return results
+    filtered = results.copy()
+    searchable = (
+        filtered["title"].fillna("").astype(str).str.lower()
+        + " "
+        + filtered.get("genres", pd.Series("", index=filtered.index)).fillna("").astype(str).str.lower()
+        + " "
+        + filtered.get("tmdb_overview", pd.Series("", index=filtered.index)).fillna("").astype(str).str.lower()
+        + " "
+        + filtered.get("features_text", pd.Series("", index=filtered.index)).fillna("").astype(str).str.lower()
+    )
+    title_text = filtered["title"].fillna("").astype(str).str.lower()
+    genre_text = filtered.get("genres", pd.Series("", index=filtered.index)).fillna("").astype(str).str.lower()
+
+    def exact_term_count(value: str) -> int:
+        return sum(1 for term in terms if re.search(rf"\b{re.escape(term)}\b", value))
+
+    term_score = searchable.apply(exact_term_count)
+    if seed_title in {"Fast X", "The Fast and the Furious"}:
+        franchise_mask = title_text.str.contains(r"\bfast\b|\bfurious\b|hobbs|shaw", regex=True, na=False)
+        action_mask = genre_text.str.contains("action|crime|thriller", regex=True, na=False)
+        keep_mask = franchise_mask | ((term_score >= 2) & action_mask) | (term_score >= 3)
+        strict = filtered.loc[keep_mask].copy()
+        if len(strict) >= 6:
+            strict_term_score = term_score.loc[strict.index]
+            strict_franchise = franchise_mask.loc[strict.index].astype(float)
+            strict_action = action_mask.loc[strict.index].astype(float)
+            strict["semantic_similarity"] = (
+                pd.to_numeric(strict.get("semantic_similarity", 0), errors="coerce").fillna(0)
+                + strict_franchise * 2.0
+                + strict_term_score.astype(float) * 0.22
+                + strict_action * 0.12
+            )
+            return strict.sort_values("semantic_similarity", ascending=False, na_position="last")
+        return filtered
+
+    mask = term_score >= 1
+    strict = filtered.loc[mask].copy()
+    return strict if len(strict) >= 6 else filtered
+
+
 def get_ai_chat_context() -> dict[str, object]:
     context = st.session_state.setdefault(
         "ai_chat_context",
@@ -3546,7 +3768,9 @@ def get_last_similar_movie_query_from_history() -> str:
     for message in reversed(messages):
         if message.get("role") != "user":
             continue
-        return extract_similar_movie_query(str(message.get("content", "")))
+        similar_query = extract_similar_movie_query(str(message.get("content", "")))
+        if similar_query:
+            return similar_query
     return ""
 
 
@@ -3570,6 +3794,7 @@ def build_chat_reply(message: str, lang: str) -> tuple[str, Optional[str], list[
   context = get_ai_chat_context()
   previous_sort_bias = st.session_state.get("ai_sort_bias", "")
   history_text = get_chat_history_text()
+  previous_similar_title_query = st.session_state.get("ai_similar_title_query") or get_last_similar_movie_query_from_history()
   history_has_latest = context.get("latest") or previous_sort_bias == "latest" or text_has_any(history_text, CHAT_LATEST_TERMS)
   history_has_quality = context.get("quality") or text_has_any(history_text, CHAT_TOP_TERMS) or text_has_any(history_text, CHAT_QUALITY_TERMS)
   history_intents, _, _, _, _, _ = extract_query_intents(history_text)
@@ -3616,7 +3841,8 @@ def build_chat_reply(message: str, lang: str) -> tuple[str, Optional[str], list[
       ai_query,
       [],
     )
-  st.session_state["ai_similar_title_query"] = ""
+  if not previous_similar_title_query:
+    st.session_state["ai_similar_title_query"] = ""
 
   if compact in CHAT_GREETING_TERMS or text_has_any(lowered, CHAT_HELP_TERMS):
     return (
@@ -3640,7 +3866,18 @@ def build_chat_reply(message: str, lang: str) -> tuple[str, Optional[str], list[
     context["latest"] = True
     context["popular"] = False
     context["top"] = False
-    st.session_state["ai_sort_bias"] = "latest"
+    st.session_state["ai_sort_bias"] = "similar_latest" if previous_similar_title_query else "latest"
+    if previous_similar_title_query:
+      st.session_state["ai_similar_title_query"] = previous_similar_title_query
+      return (
+        t(
+          lang,
+          f"Зрозумів, залишаю схожість на {previous_similar_title_query}, але піднімаю новіші фільми.",
+          f"Got it, I am keeping similarity to {previous_similar_title_query}, but prioritizing newer movies.",
+        ),
+        st.session_state.get("ai_query") or (expand_query_text(f"similar to {previous_similar_title_query}") or f"similar to {previous_similar_title_query}"),
+        [],
+      )
     if not message_has_specific_intent:
       return (
         t(
@@ -3834,7 +4071,7 @@ def refresh_ai_exclusions_from_history() -> None:
     context["genres"] = current_genres
     if text_has_any(history_text, CHAT_LATEST_TERMS):
         context["latest"] = True
-        st.session_state["ai_sort_bias"] = "latest"
+        st.session_state["ai_sort_bias"] = "similar_latest" if similar_title_query else "latest"
     if text_has_any(history_text, CHAT_QUALITY_TERMS) or text_has_any(history_text, CHAT_TOP_TERMS):
         context["quality"] = True
     if text_has_any(history_text, CHAT_POPULAR_TERMS) and not context.get("latest"):
@@ -3884,6 +4121,16 @@ def submit_chat_message(chat_text: str, lang: str) -> None:
         st.session_state["page"] = 1
     else:
         st.session_state["ai_exclude_terms"] = []
+
+
+def clear_ai_selection_state(lang: str) -> None:
+    reset_ai_chat_context()
+    st.session_state["ai_query"] = ""
+    st.session_state["ai_similar_title_query"] = ""
+    st.session_state["ai_exclude_terms"] = []
+    st.session_state["ai_sort_bias"] = ""
+    st.session_state["last_hero_ai_submit"] = ""
+    st.session_state["chat_messages"] = [{"role": "assistant", "content": get_chat_greeting(lang)}]
 
 
 def render_ai_chat_panel(lang: str) -> None:
@@ -4034,12 +4281,22 @@ def main() -> None:
     if hero_row is not None:
         hero_bg = get_backdrop(hero_row) or get_poster_display(hero_row, "EN") or ""
 
-    active_ai_query = st.session_state.get("ai_query", "").strip()
     movies_with_posters = movies[has_display_poster_frame(movies)].copy()
     all_genres = sorted({genre.strip() for genres in movies_with_posters["genres"].fillna("") for genre in str(genres).split(",") if genre.strip()})
     genre_option_map = {translate_genres(genre, lang): genre for genre in all_genres}
     y_min = int(np.nanmin(movies["year"])) if movies["year"].notna().any() else 1900
     y_max = int(np.nanmax(movies["year"])) if movies["year"].notna().any() else 2025
+    hero_panel = str(st.query_params.get("hero_panel") or "").strip()
+    if hero_panel != "title" and st.session_state.get("title_query"):
+        st.session_state["title_query"] = ""
+    if hero_panel != "ai" and (
+        st.session_state.get("ai_query")
+        or st.session_state.get("ai_similar_title_query")
+        or st.session_state.get("ai_exclude_terms")
+        or st.session_state.get("ai_sort_bias")
+    ):
+        clear_ai_selection_state(lang)
+    active_ai_query = st.session_state.get("ai_query", "").strip()
     sort_options = [
         t(lang, "За популярністю", "By popularity"),
         t(lang, "За IMDb рейтингом", "By IMDb"),
@@ -4048,7 +4305,6 @@ def main() -> None:
     if active_ai_query:
         sort_options.insert(1, t(lang, "За AI-релевантністю", "By AI relevance"))
 
-    hero_panel = str(st.query_params.get("hero_panel") or "").strip()
     title_search = st.query_params.get("title_search")
     if title_search is not None:
         st.session_state["title_query"] = str(title_search).strip()
@@ -4090,9 +4346,9 @@ def main() -> None:
     title_card_class = "ms-hero-card ms-hero-card-link" + (" ms-hero-card-active" if hero_panel == "title" else "")
     filter_card_class = "ms-hero-card ms-hero-card-link" + (" ms-hero-card-active" if hero_panel == "filters" else "")
     ai_card_class = "ms-hero-card ms-hero-card-link" + (" ms-hero-card-active" if hero_panel == "ai" else "")
-    title_panel_href = query_href_with_updates(hero_panel="title", movie=None)
-    filters_panel_href = query_href_with_updates(hero_panel="filters", movie=None)
-    ai_panel_href = query_href_with_updates(hero_panel="ai", movie=None)
+    title_panel_href = panel_switch_href("title")
+    filters_panel_href = panel_switch_href("filters")
+    ai_panel_href = panel_switch_href("ai")
     auth_input_html = auth_hidden_input()
     lang_input_html = lang_hidden_input()
 
@@ -4106,7 +4362,7 @@ def main() -> None:
           {lang_input_html}
           <label class="ms-hero-field">
             <span>{html.escape(t(lang, "Знайти фільм за назвою", "Find a movie by title"))}</span>
-            <input class="ms-hero-input" type="text" name="title_search" value="{html.escape(st.session_state.get("title_query", ""), quote=True)}" placeholder="{html.escape(t(lang, "Назва фільму...", "Movie title..."), quote=True)}" />
+            <textarea class="ms-hero-input ms-hero-title-textarea" name="title_search" placeholder="{html.escape(t(lang, "Назва фільму...", "Movie title..."), quote=True)}">{html.escape(st.session_state.get("title_query", ""))}</textarea>
           </label>
           <button class="ms-hero-submit" type="submit">{html.escape(t(lang, "Шукати", "Search"))}</button>
         </form>
@@ -4231,7 +4487,6 @@ def main() -> None:
             """,
             unsafe_allow_html=True,
         )
-
     active_ai_query = st.session_state.get("ai_query", "").strip()
     movies_with_posters = movies[has_display_poster_frame(movies)].copy()
     all_genres = sorted({genre.strip() for genres in movies_with_posters["genres"].fillna("") for genre in str(genres).split(",") if genre.strip()})
@@ -4258,7 +4513,7 @@ def main() -> None:
     ai_sort_bias = st.session_state.get("ai_sort_bias", "")
     ai_context = get_ai_chat_context()
     ai_filter_text = " ".join(part for part in [ai_query, get_chat_history_text()] if part)
-    if ai_query.strip() and text_has_any(ai_filter_text.lower(), CHAT_LATEST_TERMS):
+    if ai_query.strip() and not similar_title_query and text_has_any(ai_filter_text.lower(), CHAT_LATEST_TERMS):
         ai_context["latest"] = True
         ai_sort_bias = "latest"
         st.session_state["ai_sort_bias"] = "latest"
@@ -4315,7 +4570,12 @@ def main() -> None:
                 )
                 filtered = filtered.sort_values("semantic_similarity", ascending=False, na_position="last")
                 filtered = filtered.drop_duplicates("_similar_key", keep="first").drop(columns=["_similar_key"])
+        filtered = add_related_title_candidates(filtered, seed_title, movies)
         filtered = apply_similar_profile_boost(filtered, seed_title, movies)
+        filtered = apply_required_similarity_terms(filtered, seed_title)
+        filtered = filtered[
+            filtered["title"].fillna("").astype(str).str.lower() != str(seed_title).lower()
+        ].copy()
         filtered = filtered[has_display_poster_frame(filtered)].copy()
         if filtered.empty and ai_query.strip():
             tfidf, tfidf_matrix, _ = get_similarity(movies)
@@ -4428,7 +4688,26 @@ def main() -> None:
                 newest = rated_newest
         filtered = newest
 
-    if similar_title_query and "semantic_similarity" in filtered.columns:
+    if similar_title_query and ai_sort_bias == "similar_latest":
+        similarity_score = pd.to_numeric(filtered.get("semantic_similarity", 0), errors="coerce").fillna(0)
+        year_score = pd.to_numeric(filtered["year"], errors="coerce")
+        if year_score.notna().any():
+            max_similar_year = int(year_score.max())
+            recent_mask = year_score.ge(max_similar_year - 2)
+            recent_filtered = filtered.loc[recent_mask].copy()
+            if len(recent_filtered) >= 6:
+                filtered = recent_filtered
+                similarity_score = pd.to_numeric(filtered.get("semantic_similarity", 0), errors="coerce").fillna(0)
+                year_score = pd.to_numeric(filtered["year"], errors="coerce")
+        if year_score.notna().any() and year_score.max() != year_score.min():
+            recency_score = (year_score - year_score.min()) / (year_score.max() - year_score.min())
+        else:
+            recency_score = pd.Series(0.0, index=filtered.index)
+        rating_score = filtered.get("_ms_rating_score", pd.Series(0.0, index=filtered.index))
+        rating_score = pd.to_numeric(rating_score, errors="coerce").fillna(0).clip(0, 10) / 10
+        filtered = filtered.assign(_ms_similar_latest_score=similarity_score * 0.78 + recency_score.fillna(0) * 0.17 + rating_score * 0.05)
+        filtered = filtered.sort_values(["_ms_similar_latest_score", "year", "semantic_similarity"], ascending=[False, False, False], na_position="last")
+    elif similar_title_query and "semantic_similarity" in filtered.columns:
         filtered = filtered.sort_values("semantic_similarity", ascending=False, na_position="last")
     elif ai_query.strip() and ai_sort_bias == "latest" and ai_context.get("quality") and "_ms_rating_score" in filtered.columns:
         filtered = filtered.sort_values(["year", "_ms_rating_score", "tmdb_popularity"], ascending=[False, False, False], na_position="last")
